@@ -1,0 +1,49 @@
+{
+  "name": "stalabard-dao-marketplace",
+  "version": "1.0.0",
+  "description": "Multi-vendor marketplace powered by Fleetbase with DAO governance integration",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:platform": "jest tests/platform-setup.test.js",
+    "test:extensions": "jest tests/extension-installation.test.js",
+    "test:network": "jest tests/network-creation.test.js",
+    "test:acceptance": "jest tests/acceptance-criteria.test.js",
+    "test:all": "jest --runInBand",
+    "setup": "node scripts/setup.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "health": "curl http://localhost:8000/health",
+    "verify": "node -e \"console.log('Run: .\\\\scripts\\\\verify-setup.ps1 (Windows) or ./scripts/verify-setup.sh (Linux/Mac)')\""
+  },
+  "keywords": [
+    "fleetbase",
+    "marketplace",
+    "dao",
+    "solana",
+    "multi-vendor"
+  ],
+  "author": "Stalabard DAO",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "axios": "^1.6.0",
+    "mysql2": "^3.6.0",
+    "redis": "^4.6.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 30000,
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "tests/**/*.js"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  }
+}
