@@ -1,6 +1,9 @@
 const axios = require('axios');
 const { execSync } = require('child_process');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 describe('Extension Installation', () => {
   const FLEETBASE_URL = process.env.FLEETBASE_URL || 'http://localhost:8000';
   let authToken;

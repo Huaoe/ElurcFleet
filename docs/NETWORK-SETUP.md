@@ -396,7 +396,7 @@ After creating the network, verify:
 
 After successful network creation:
 
-1. ✅ Configure DAO environment variables (see docs/DAO-CONFIGURATION.md)
+1. ✅ Configure DAO environment variables (see README.md Environment Configuration section)
 2. Test network API endpoints
 3. Prepare for member authentication extension (Story 1.2)
 4. Set up initial store for testing

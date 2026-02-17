@@ -3,6 +3,9 @@ const axios = require('axios');
 const mysql = require('mysql2/promise');
 const redis = require('redis');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 describe('Fleetbase Platform Setup', () => {
   const FLEETBASE_URL = process.env.FLEETBASE_URL || 'http://localhost:8000';
   const DB_HOST = process.env.DB_HOST || 'localhost';

@@ -3,9 +3,9 @@
 fleetbase/.env
 *.env.local
 
-# Fleetbase storage and logs
-fleetbase/storage/
-fleetbase/logs/
+# Fleetbase runtime data
+fleetbase/
+!fleetbase/.gitkeep
 
 # Database data
 mysql-data/

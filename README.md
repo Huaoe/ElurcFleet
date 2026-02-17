@@ -187,6 +187,44 @@ After successful installation:
 3. Set up seller store creation (Story 2.1)
 4. Configure product management (Story 3.1)
 
+## Testing
+
+### Obtaining FLEETBASE_TEST_TOKEN
+
+Some tests require an authenticated API token. To generate one:
+
+1. Start Fleetbase containers: `docker-compose up -d`
+2. Access Fleetbase Console at http://localhost:8000/console
+3. Create an admin account or log in
+4. Generate API token via Console (Settings → API Keys) or via CLI:
+   ```bash
+   docker-compose exec fleetbase-api php artisan tinker
+   # Then in tinker:
+   $user = \Fleetbase\Models\User::first();
+   $token = $user->createToken('test-token');
+   echo $token->plainTextToken;
+   ```
+5. Add token to `.env`:
+   ```bash
+   FLEETBASE_TEST_TOKEN=your_generated_token_here
+   ```
+
+### Running Tests
+
+```bash
+# Install dependencies
+yarn install
+
+# Run all tests
+yarn test
+
+# Run specific test suites
+yarn test:platform      # Platform setup tests
+yarn test:extensions    # Extension installation tests
+yarn test:network       # Network creation tests
+yarn test:acceptance    # Acceptance criteria tests
+```
+
 ## Support
 
 - **Fleetbase Documentation**: https://docs.fleetbase.io

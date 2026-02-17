@@ -1,5 +1,8 @@
 const axios = require('axios');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 describe('Network Creation', () => {
   const FLEETBASE_URL = process.env.FLEETBASE_URL || 'http://localhost:8000';
   const NETWORK_NAME = 'Stalabard DAO Marketplace';
