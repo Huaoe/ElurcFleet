@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   fleetbase-api:
-    image: fleetbase/fleetbase:latest
+    build:
+      context: ./fleetbase
+      dockerfile: Dockerfile
     container_name: fleetbase-api
     ports:
       - "8000:8000"
@@ -27,6 +27,7 @@ services:
       - ./fleetbase/storage:/var/www/html/storage
       - ./fleetbase/extensions:/var/www/html/extensions
       - ./fleetbase/.env:/var/www/html/.env
+      - ./product-importer/uploads:/var/www/html/storage/uploads/products:ro
     depends_on:
       - mysql
       - redis
@@ -76,6 +77,27 @@ services:
     networks:
       - fleetbase-network
     restart: unless-stopped
+
+  product-importer:
+    build:
+      context: ./product-importer
+      dockerfile: Dockerfile
+    container_name: product-importer
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=fleetbase
+      - DB_PASSWORD=fleetbase_password
+      - DB_DATABASE=fleetbase_storefront
+    volumes:
+      - ./product-importer:/app
+      - /app/node_modules
+    depends_on:
+      - mysql
+    networks:
+      - fleetbase-network
+    profiles:
+      - tools
 
 volumes:
   mysql-data:

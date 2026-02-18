@@ -48,11 +48,11 @@ function Test-Criterion {
     }
     catch {
         if ($Optional) {
-            Write-Host "[WARN] $FailureMessage (Optional): ${_}" -ForegroundColor Yellow
+            Write-Host "[WARN] ${FailureMessage} (Optional): $($_.Exception.Message)" -ForegroundColor Yellow
             $script:warnCount++
         }
         else {
-            Write-Host "[FAIL] $FailureMessage: ${_}" -ForegroundColor Red
+            Write-Host "[FAIL] ${FailureMessage}: $($_.Exception.Message)" -ForegroundColor Red
             $script:failCount++
         }
         return $false
@@ -63,11 +63,11 @@ Write-Host "AC1: Docker Installation and Configuration" -ForegroundColor Cyan
 Write-Host "===========================================" -ForegroundColor Cyan
 
 Test-Criterion -Name "Docker containers running" -Test {
-    $output = docker-compose ps --format json | ConvertFrom-Json
-    $running = $output | Where-Object { $_.State -eq "running" }
+    $output = docker ps --format json | ConvertFrom-Json
+    $running = $output | Where-Object { $_.Names -match "fleetbase" -and $_.State -eq "running" }
     return $running.Count -ge 4
-} -SuccessMessage "All required containers are running" `
-  -FailureMessage "Some containers are not running"
+} -SuccessMessage "All required Fleetbase containers are running" `
+  -FailureMessage "Some Fleetbase containers are not running"
 
 Test-Criterion -Name "Fleetbase API accessible" -Test {
     $response = Invoke-WebRequest -Uri "http://localhost:8000/health" -TimeoutSec 5 -ErrorAction Stop
@@ -76,13 +76,13 @@ Test-Criterion -Name "Fleetbase API accessible" -Test {
   -FailureMessage "Fleetbase API is not accessible"
 
 Test-Criterion -Name "Database initialized" -Test {
-    $output = docker-compose exec -T mysql mysql -ufleetbase -pfleetbase_password -e "SHOW TABLES;" fleetbase 2>&1
+    $output = docker exec fleetbase-database-1 mysql -uroot -e "SHOW TABLES;" fleetbase 2>&1
     return $output -match "Tables_in_fleetbase"
 } -SuccessMessage "Database is initialized with tables" `
   -FailureMessage "Database is not properly initialized"
 
 Test-Criterion -Name "Redis accessible" -Test {
-    $output = docker-compose exec -T redis redis-cli ping 2>&1
+    $output = docker exec fleetbase-cache-1 redis-cli ping 2>&1
     return $output -match "PONG"
 } -SuccessMessage "Redis is accessible" `
   -FailureMessage "Redis is not accessible"
@@ -98,7 +98,7 @@ Test-Criterion -Name "Network API endpoint" -Test {
   -FailureMessage "Network API endpoint is not accessible"
 
 Test-Criterion -Name "Environment file exists" -Test {
-    return Test-Path "fleetbase\.env"
+    return (Test-Path "fleetbase\api\.env") -or (Test-Path ".env")
 } -SuccessMessage "Environment file exists" `
   -FailureMessage "Environment file does not exist"
 
@@ -107,38 +107,50 @@ Write-Host "AC3: DAO Integration Configuration" -ForegroundColor Cyan
 Write-Host "===================================" -ForegroundColor Cyan
 
 Test-Criterion -Name "DAO_ADDRESS configured" -Test {
-    $envContent = Get-Content "fleetbase\.env" -ErrorAction SilentlyContinue
+    $envContent = Get-Content "fleetbase\api\.env" -ErrorAction SilentlyContinue
     if (-not $envContent) {
-        $envContent = Get-Content ".env.example"
+        $envContent = Get-Content ".env" -ErrorAction SilentlyContinue
+    }
+    if (-not $envContent) {
+        $envContent = Get-Content ".env.example" -ErrorAction SilentlyContinue
     }
     return $envContent -match "DAO_ADDRESS=D6d8TZrNFwg3QG97JLLfTjgdJequ84wMhQ8f12UW56Rq"
 } -SuccessMessage "DAO_ADDRESS is configured correctly" `
   -FailureMessage "DAO_ADDRESS is not configured"
 
 Test-Criterion -Name "DAO_NFT_COLLECTION configured" -Test {
-    $envContent = Get-Content "fleetbase\.env" -ErrorAction SilentlyContinue
+    $envContent = Get-Content "fleetbase\api\.env" -ErrorAction SilentlyContinue
     if (-not $envContent) {
-        $envContent = Get-Content ".env.example"
+        $envContent = Get-Content ".env" -ErrorAction SilentlyContinue
+    }
+    if (-not $envContent) {
+        $envContent = Get-Content ".env.example" -ErrorAction SilentlyContinue
     }
     return $envContent -match "DAO_NFT_COLLECTION=3e22667e998143beef529eda8c84ee394a838aa705716c3b6fe0b3d5f913ac4c"
 } -SuccessMessage "DAO_NFT_COLLECTION is configured correctly" `
   -FailureMessage "DAO_NFT_COLLECTION is not configured"
 
 Test-Criterion -Name "SOLANA_RPC_URL configured" -Test {
-    $envContent = Get-Content "fleetbase\.env" -ErrorAction SilentlyContinue
+    $envContent = Get-Content "fleetbase\api\.env" -ErrorAction SilentlyContinue
     if (-not $envContent) {
-        $envContent = Get-Content ".env.example"
+        $envContent = Get-Content ".env" -ErrorAction SilentlyContinue
+    }
+    if (-not $envContent) {
+        $envContent = Get-Content ".env.example" -ErrorAction SilentlyContinue
     }
     return $envContent -match "SOLANA_RPC_URL=https://api\.(devnet|mainnet-beta)\.solana\.com"
 } -SuccessMessage "SOLANA_RPC_URL is configured correctly" `
   -FailureMessage "SOLANA_RPC_URL is not configured"
 
 Test-Criterion -Name "Redis configuration" -Test {
-    $envContent = Get-Content "fleetbase\.env" -ErrorAction SilentlyContinue
+    $envContent = Get-Content "fleetbase\api\.env" -ErrorAction SilentlyContinue
     if (-not $envContent) {
-        $envContent = Get-Content ".env.example"
+        $envContent = Get-Content ".env" -ErrorAction SilentlyContinue
     }
-    return ($envContent -match "REDIS_HOST=redis") -and ($envContent -match "CACHE_DRIVER=redis") -and ($envContent -match "SESSION_DRIVER=redis")
+    if (-not $envContent) {
+        $envContent = Get-Content ".env.example" -ErrorAction SilentlyContinue
+    }
+    return ($envContent -match "REDIS_URL=tcp://cache") -or (($envContent -match "REDIS_HOST=redis") -and ($envContent -match "CACHE_DRIVER=redis") -and ($envContent -match "SESSION_DRIVER=redis"))
 } -SuccessMessage "Redis is configured for sessions and cache" `
   -FailureMessage "Redis configuration is incomplete"
 
@@ -200,11 +212,12 @@ if ($failCount -eq 0) {
     Write-Host "[SUCCESS] All acceptance criteria verified!" -ForegroundColor Green
     Write-Host ""
     Write-Host "Next Steps:" -ForegroundColor Cyan
-    Write-Host "1. Access Fleetbase Console: http://localhost:8000/console"
-    Write-Host "2. Install extensions via Console (Storefront, FleetOps)"
-    Write-Host "3. Create Network: 'Stalabard DAO Marketplace'"
-    Write-Host "4. Generate and save Network Key"
-    Write-Host "5. Run automated tests: npm test"
+    Write-Host "1. Access Fleetbase Console: http://localhost:4200"
+    Write-Host "2. Log in with admin@stalabard.com / password"
+    Write-Host "3. Install extensions via Console (Storefront, FleetOps)"
+    Write-Host "4. Create Network: 'Stalabard DAO Marketplace'"
+    Write-Host "5. Generate and save Network Key"
+    Write-Host "6. Run automated tests: npm test"
     Write-Host ""
     exit 0
 }

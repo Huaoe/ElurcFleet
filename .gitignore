@@ -1,3 +1,6 @@
+#dir
+product-importer/
+
 # Environment files
 .env
 fleetbase/.env

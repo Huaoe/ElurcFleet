@@ -129,6 +129,48 @@ class MiddlewareProtectionTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_update_profile_endpoint_allows_verified_member()
+    {
+        $response = $this->actingAs($this->verifiedUser)
+            ->patchJson('/storefront/v1/membership/profile', [
+                'display_name' => 'UpdatedMemberName',
+                'avatar_url' => 'https://example.com/new-avatar.png',
+                'bio' => 'Updated bio information',
+            ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.member_uuid', $this->memberIdentity->uuid);
+        $response->assertJsonPath('data.profile.display_name', 'UpdatedMemberName');
+
+        $this->assertDatabaseHas('member_profiles', [
+            'uuid' => $this->memberProfile->uuid,
+            'display_name' => 'UpdatedMemberName',
+            'avatar_url' => 'https://example.com/new-avatar.png',
+            'bio' => 'Updated bio information',
+        ]);
+    }
+
+    public function test_update_profile_endpoint_returns_422_for_invalid_avatar_url()
+    {
+        $response = $this->actingAs($this->verifiedUser)
+            ->patchJson('/storefront/v1/membership/profile', [
+                'avatar_url' => 'not-a-valid-url',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['avatar_url']);
+    }
+
+    public function test_update_profile_endpoint_blocks_non_member_user()
+    {
+        $response = $this->actingAs($this->nonMemberUser)
+            ->patchJson('/storefront/v1/membership/profile', [
+                'display_name' => 'ShouldNotUpdate',
+            ]);
+
+        $response->assertStatus(403);
+    }
+
     public function test_error_response_includes_correlation_id()
     {
         $response = $this->actingAs($this->nonMemberUser)

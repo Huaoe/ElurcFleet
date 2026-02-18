@@ -3,11 +3,14 @@
 namespace Tests\Unit\Membership;
 
 use Fleetbase\Membership\Http\Controllers\MembershipController;
+use Fleetbase\Membership\Http\Requests\UpdateMemberProfileRequest;
 use Fleetbase\Membership\Http\Requests\VerifyMembershipRequest;
 use Fleetbase\Membership\Models\MemberIdentity;
 use Fleetbase\Membership\Models\MemberProfile;
 use Fleetbase\Membership\Services\MemberIdentityService;
+use Fleetbase\Membership\Services\MemberProfileService;
 use Fleetbase\Membership\Services\MembershipVerificationService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -21,6 +24,7 @@ class MembershipControllerTest extends TestCase
     protected MembershipController $controller;
     protected MembershipVerificationService $verificationService;
     protected MemberIdentityService $memberService;
+    protected MemberProfileService $profileService;
 
     protected function setUp(): void
     {
@@ -28,10 +32,12 @@ class MembershipControllerTest extends TestCase
 
         $this->verificationService = $this->createMock(MembershipVerificationService::class);
         $this->memberService = $this->createMock(MemberIdentityService::class);
+        $this->profileService = $this->createMock(MemberProfileService::class);
         
         $this->controller = new MembershipController(
             $this->verificationService,
-            $this->memberService
+            $this->memberService,
+            $this->profileService
         );
 
         // Clear cache for replay attack tests
@@ -218,5 +224,85 @@ class MembershipControllerTest extends TestCase
         $this->assertEquals(403, $response->getStatusCode());
         $data = json_decode($response->getContent(), true);
         $this->assertStringContainsString('Invalid Challenge', $data['errors'][0]['title']);
+    }
+
+    public function test_update_profile_returns_success_response_with_valid_data()
+    {
+        $member = MemberIdentity::factory()->create([
+            'membership_status' => MemberIdentity::STATUS_VERIFIED,
+        ]);
+
+        $profile = MemberProfile::factory()->create([
+            'member_identity_uuid' => $member->uuid,
+            'display_name' => 'Before Name',
+        ]);
+
+        $this->profileService
+            ->expects($this->once())
+            ->method('updateProfile')
+            ->with($member->uuid, [
+                'display_name' => 'Updated Name',
+                'avatar_url' => 'https://example.com/avatar.png',
+                'bio' => 'Updated bio',
+            ])
+            ->willReturn($profile->forceFill([
+                'display_name' => 'Updated Name',
+                'avatar_url' => 'https://example.com/avatar.png',
+                'bio' => 'Updated bio',
+            ]));
+
+        $request = UpdateMemberProfileRequest::create('/membership/profile', 'PATCH', [
+            'display_name' => 'Updated Name',
+            'avatar_url' => 'https://example.com/avatar.png',
+            'bio' => 'Updated bio',
+        ]);
+        $request->setContainer($this->app);
+        $request->attributes->set('member_identity', $member);
+
+        $response = $this->controller->updateProfile($request);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals($member->uuid, $data['data']['member_uuid']);
+        $this->assertEquals('Updated Name', $data['data']['profile']['display_name']);
+        $this->assertArrayNotHasKey('wallet_address', $data['data']['profile']);
+    }
+
+    public function test_update_profile_returns_401_when_member_context_missing()
+    {
+        $request = UpdateMemberProfileRequest::create('/membership/profile', 'PATCH', [
+            'display_name' => 'Updated Name',
+        ]);
+        $request->setContainer($this->app);
+
+        $response = $this->controller->updateProfile($request);
+
+        $this->assertEquals(401, $response->getStatusCode());
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('Unauthorized', $data['errors'][0]['title']);
+    }
+
+    public function test_update_profile_returns_404_when_profile_not_found()
+    {
+        $member = MemberIdentity::factory()->create([
+            'membership_status' => MemberIdentity::STATUS_VERIFIED,
+        ]);
+
+        $this->profileService
+            ->expects($this->once())
+            ->method('updateProfile')
+            ->willThrowException(new ModelNotFoundException());
+
+        $request = UpdateMemberProfileRequest::create('/membership/profile', 'PATCH', [
+            'display_name' => 'Updated Name',
+        ]);
+        $request->setContainer($this->app);
+        $request->attributes->set('member_identity', $member);
+
+        $response = $this->controller->updateProfile($request);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('Profile Not Found', $data['errors'][0]['title']);
     }
 }

@@ -76,7 +76,14 @@ class VerificationApiTest extends TestCase
         $data = $response->json('data');
         $this->assertEquals('verified', $data['membership_status']);
         $this->assertNotEmpty($data['token']);
-        $this->assertStringStartsWith('stalabard-membership.', $data['token']);
+        // Sanctum tokens have format: {tokenId}|{hash}
+        $this->assertStringContainsString('|', $data['token']);
+
+        $memberUuid = $data['member_uuid'];
+        $this->assertDatabaseHas('member_profiles', [
+            'member_identity_uuid' => $memberUuid,
+            'display_name' => substr($walletAddress, 0, 8),
+        ]);
     }
 
     public function test_verification_failure_returns_403()
@@ -228,6 +235,7 @@ class VerificationApiTest extends TestCase
         $data = $response->json('data');
         $this->assertEquals($member->uuid, $data['member_uuid']);
         $this->assertEquals('Test Member', $data['profile']['display_name']);
+        $this->assertArrayNotHasKey('wallet_address', $data['profile']);
     }
 
     public function test_profile_endpoint_requires_authentication()
@@ -267,6 +275,13 @@ class VerificationApiTest extends TestCase
             'nft_token_account' => 'OldTokenAccount123',
         ]);
 
+        MemberProfile::create([
+            'member_identity_uuid' => $existingMember->uuid,
+            'display_name' => 'ExistingName',
+            'avatar_url' => null,
+            'bio' => null,
+        ]);
+
         Http::fake([
             '*' => Http::response([
                 'result' => [
@@ -300,6 +315,7 @@ class VerificationApiTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertEquals(1, MemberIdentity::where('wallet_address', $walletAddress)->count());
+        $this->assertEquals(1, MemberProfile::where('member_identity_uuid', $existingMember->uuid)->count());
         
         $updatedMember = MemberIdentity::where('wallet_address', $walletAddress)->first();
         $this->assertEquals($existingMember->uuid, $updatedMember->uuid);
@@ -308,27 +324,22 @@ class VerificationApiTest extends TestCase
 
     protected function createTestToken(MemberIdentity $member): string
     {
-        $payload = [
-            'member_uuid' => $member->uuid,
-            'wallet_address' => $member->wallet_address,
-            'membership_status' => $member->membership_status,
-            'issued_at' => now()->timestamp,
-            'expires_at' => now()->addDays(7)->timestamp,
-        ];
-
-        return 'stalabard-membership.' . base64_encode(json_encode($payload));
+        $tokenName = config('membership.auth.token_name', 'stalabard-membership');
+        $token = $member->createToken($tokenName, ['membership:read', 'membership:write']);
+        
+        return $token->plainTextToken;
     }
 
     protected function createExpiredToken(MemberIdentity $member): string
     {
-        $payload = [
-            'member_uuid' => $member->uuid,
-            'wallet_address' => $member->wallet_address,
-            'membership_status' => $member->membership_status,
-            'issued_at' => now()->subDays(8)->timestamp,
-            'expires_at' => now()->subDays(1)->timestamp,
-        ];
-
-        return 'stalabard-membership.' . base64_encode(json_encode($payload));
+        // Create a token and manually expire it in the database
+        $tokenName = config('membership.auth.token_name', 'stalabard-membership');
+        $token = $member->createToken($tokenName, ['membership:read', 'membership:write']);
+        
+        // Update the token's expiration to the past
+        \Laravel\Sanctum\PersonalAccessToken::where('tokenable_id', $member->uuid)
+            ->update(['expires_at' => now()->subDay()]);
+        
+        return $token->plainTextToken;
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Membership;
 
 use Fleetbase\Membership\Models\MemberIdentity;
+use Fleetbase\Membership\Models\MemberProfile;
 use Fleetbase\Membership\Services\MemberIdentityService;
 use Fleetbase\Membership\Services\MembershipVerificationService;
 use Fleetbase\Membership\Services\SolanaRpcService;
@@ -229,6 +230,59 @@ class MembershipVerificationServiceTest extends TestCase
         $result = $this->service->verifyMembership('wallet_123', 'signature');
 
         $this->assertFalse($result['success']);
+    }
+
+    public function test_ensure_member_profile_creates_profile_with_default_display_name()
+    {
+        $member = MemberIdentity::create([
+            'wallet_address' => '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
+            'membership_status' => MemberIdentity::STATUS_VERIFIED,
+        ]);
+
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('ensureMemberProfile');
+        $method->setAccessible(true);
+
+        $profile = $method->invoke($this->service, $member, 'test-correlation-id');
+
+        $this->assertInstanceOf(MemberProfile::class, $profile);
+        $this->assertEquals($member->uuid, $profile->member_identity_uuid);
+        $this->assertEquals('7xKXtg2C', $profile->display_name);
+
+        $this->assertDatabaseHas('member_profiles', [
+            'uuid' => $profile->uuid,
+            'member_identity_uuid' => $member->uuid,
+            'display_name' => '7xKXtg2C',
+        ]);
+    }
+
+    public function test_ensure_member_profile_is_idempotent()
+    {
+        $member = MemberIdentity::create([
+            'wallet_address' => '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
+            'membership_status' => MemberIdentity::STATUS_VERIFIED,
+        ]);
+
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('ensureMemberProfile');
+        $method->setAccessible(true);
+
+        $firstProfile = $method->invoke($this->service, $member, 'corr-1');
+        $secondProfile = $method->invoke($this->service, $member, 'corr-2');
+
+        $this->assertEquals($firstProfile->uuid, $secondProfile->uuid);
+        $this->assertEquals(1, MemberProfile::where('member_identity_uuid', $member->uuid)->count());
+    }
+
+    public function test_generate_default_display_name_uses_first_eight_characters()
+    {
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('generateDefaultDisplayName');
+        $method->setAccessible(true);
+
+        $displayName = $method->invoke($this->service, 'ABCDEFGH12345678');
+
+        $this->assertEquals('ABCDEFGH', $displayName);
     }
 
     public function test_service_is_injectable_via_container()

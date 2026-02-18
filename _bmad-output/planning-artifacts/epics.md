@@ -152,33 +152,33 @@ This document provides the complete epic and story breakdown for ElurcFleet, dec
 - **FR-003**: Epic 1, Epic 2 - Members can act as both seller and buyer
 - **FR-004**: Epic 2 - Seller views scoped to own store
 - **FR-005**: Epic 1 - Non-member access denial
-- **FR-010**: Epic 3 - Product creation with Storefront
-- **FR-011**: Epic 3 - Direct product publishing (approved status)
-- **FR-012**: Epic 8 - DAO reactive moderation on flagged products
-- **FR-013**: Epic 8 - Moderation actions (warn, suspend, unpublish)
-- **FR-014**: Epic 3, Epic 8 - Auditable intervention actions
-- **FR-020**: Epic 3, Epic 5 - Governance-filtered product visibility
+- **FR-010**: Epic 4 - Product creation with Storefront
+- **FR-011**: Epic 4 - Direct product publishing (approved status)
+- **FR-012**: Epic 9 - DAO reactive moderation on flagged products
+- **FR-013**: Epic 9 - Moderation actions (warn, suspend, unpublish)
+- **FR-014**: Epic 4, Epic 9 - Auditable intervention actions
+- **FR-020**: Epic 4, Epic 6 - Governance-filtered product visibility
 - **FR-021**: Epic 2 - Store-scoped product/order management
-- **FR-022**: Epic 5 - Order attribution (buyer/seller)
-- **FR-023**: Epic 4, Epic 5 - Delivery point selection during checkout
-- **FR-024**: Epic 5 - Orders route through delivery points
-- **FR-025**: Epic 7 - 3-leg order flow tracking
-- **FR-026**: Epic 7 - Seller order notifications with hub details
-- **FR-027**: Epic 7 - Seller order activity updates
-- **FR-028**: Epic 7 - Grocery store ready-for-pickup marking
-- **FR-029**: Epic 7 - Customer pickup codes and notifications
-- **FR-030**: Epic 6 - ELURC-only payment enforcement
-- **FR-031**: Epic 6 - Phantom wallet support
-- **FR-032**: Epic 6 - Non-custodial (no private key custody)
-- **FR-033**: Epic 6 - Transaction verification before completion
-- **FR-034**: Epic 6 - Payment metadata persistence
-- **FR-035**: Epic 6 - Non-ELURC payment rejection
-- **FR-040**: Epic 3 - Product lifecycle logging
-- **FR-041**: Epic 7 - Order routing transition logging
-- **FR-042**: Epic 8 - Moderation action logging
-- **FR-043**: Epic 8 - Operational summaries and reports
-- **FR-044**: Epic 7, Epic 8 - Network-wide order visibility
-- **FR-045**: Epic 4, Epic 8 - Delivery point performance metrics
+- **FR-022**: Epic 6 - Order attribution (buyer/seller)
+- **FR-023**: Epic 5, Epic 6 - Delivery point selection during checkout
+- **FR-024**: Epic 6 - Orders route through delivery points
+- **FR-025**: Epic 8 - 3-leg order flow tracking
+- **FR-026**: Epic 8 - Seller order notifications with hub details
+- **FR-027**: Epic 8 - Seller order activity updates
+- **FR-028**: Epic 8 - Grocery store ready-for-pickup marking
+- **FR-029**: Epic 8 - Customer pickup codes and notifications
+- **FR-030**: Epic 7 - ELURC-only payment enforcement
+- **FR-031**: Epic 7 - Phantom wallet support
+- **FR-032**: Epic 7 - Non-custodial (no private key custody)
+- **FR-033**: Epic 7 - Transaction verification before completion
+- **FR-034**: Epic 7 - Payment metadata persistence
+- **FR-035**: Epic 7 - Non-ELURC payment rejection
+- **FR-040**: Epic 4 - Product lifecycle logging
+- **FR-041**: Epic 8 - Order routing transition logging
+- **FR-042**: Epic 9 - Moderation action logging
+- **FR-043**: Epic 9 - Operational summaries and reports
+- **FR-044**: Epic 8, Epic 9 - Network-wide order visibility
+- **FR-045**: Epic 5, Epic 9 - Delivery point performance metrics
 
 ## Epic List
 
@@ -200,7 +200,7 @@ Verified members can join the Stalabard Network as independent sellers with thei
 
 ---
 
-### Epic 3: Product Catalog Management
+### Epic 4: Product Catalog Management
 Sellers can create, publish, and manage products with DAO governance metadata.
 
 **FRs covered:** FR-010, FR-011, FR-014, FR-020, FR-040
@@ -209,7 +209,7 @@ Sellers can create, publish, and manage products with DAO governance metadata.
 
 ---
 
-### Epic 4: Delivery Point Infrastructure
+### Epic 5: Delivery Point Infrastructure
 Platform operators can configure grocery stores as delivery hubs, and buyers can view available pickup locations.
 
 **FRs covered:** FR-023, FR-045
@@ -218,7 +218,7 @@ Platform operators can configure grocery stores as delivery hubs, and buyers can
 
 ---
 
-### Epic 5: Marketplace Shopping & Checkout
+### Epic 6: Marketplace Shopping & Checkout
 Buyers can browse published products across all Network stores and select delivery points during checkout.
 
 **FRs covered:** FR-020, FR-022, FR-023, FR-024
@@ -227,7 +227,7 @@ Buyers can browse published products across all Network stores and select delive
 
 ---
 
-### Epic 6: ELURC Non-Custodial Payments
+### Epic 7: ELURC Non-Custodial Payments
 Buyers can complete purchases using ELURC tokens via Phantom wallet with non-custodial payment verification.
 
 **FRs covered:** FR-030, FR-031, FR-032, FR-033, FR-034, FR-035
@@ -236,7 +236,7 @@ Buyers can complete purchases using ELURC tokens via Phantom wallet with non-cus
 
 ---
 
-### Epic 7: 3-Leg Order Fulfillment & Routing
+### Epic 8: 3-Leg Order Fulfillment & Routing
 Orders route through a 3-leg delivery workflow (seller → grocery store → customer pickup) with status tracking and notifications.
 
 **FRs covered:** FR-025, FR-026, FR-027, FR-028, FR-029, FR-041, FR-044
@@ -245,7 +245,7 @@ Orders route through a 3-leg delivery workflow (seller → grocery store → cus
 
 ---
 
-### Epic 8: DAO Moderation & Platform Oversight
+### Epic 9: DAO Moderation & Platform Oversight
 DAO moderators can reactively intervene on flagged products, and platform operators can monitor network health and performance.
 
 **FRs covered:** FR-012, FR-013, FR-014, FR-042, FR-043, FR-044, FR-045
@@ -459,11 +459,169 @@ So that other members can identify me in the marketplace.
 **Then** My display_name and avatar_url are visible
 **And** My wallet_address is NOT exposed (privacy)
 
-## Epic 2: Seller Network Participation
+## Epic 2: Product Catalog Import
+
+Import 4,000 products from pre-scraped JSON files into the Fleetbase Storefront "shop" network, including hierarchical category creation, image migration, variant management, and metadata preservation.
+
+### Story 2.1: Category Hierarchy Import Script
+
+**As a platform operator,**
+**I want to create a script that imports the 42 hierarchical product categories,**
+**So that the product catalog is properly organized.**
+
+**Acceptance Criteria:**
+
+**Given** product JSON files exist in `product-importer/json/`
+**When** I run the category import script
+**Then** Script scans all 8 JSON files and extracts unique `categoryPath` arrays
+**And** Script builds category tree with 3 levels (parent → child → grandchild)
+**And** Script creates 42 categories via Fleetbase Storefront API
+
+**Given** category creation process
+**When** Script creates each category
+**Then** Categories are created with proper parent UUID references
+**And** Script handles existing categories with find-or-create pattern
+**And** Script outputs category mapping JSON (name → UUID)
+
+**Given** category import completes
+**When** Script finishes execution
+**Then** All 42 categories successfully created in Fleetbase
+**And** Category hierarchy is preserved (parent-child relationships)
+**And** Script logs creation progress and any errors
+
+### Story 2.2: Image Migration to Fleetbase Storage
+
+**As a platform operator,**
+**I want to migrate product images from local storage to Fleetbase,**
+**So that product images are properly hosted and accessible.**
+
+**Acceptance Criteria:**
+
+**Given** product images exist in `product-importer/uploads/` (4,610 files)
+**When** I run the image migration script
+**Then** Script scans directory and identifies all image files
+**And** Script uploads images to Fleetbase storage via API
+
+**Given** image upload process
+**When** Script uploads each image
+**Then** Images are processed in batches of 50-100
+**And** Script handles upload failures with retry logic (3 attempts)
+**And** Script skips already-uploaded images (idempotent)
+
+**Given** image migration completes
+**When** Script finishes execution
+**Then** Script generates mapping JSON (local path → Fleetbase URL)
+**And** All 4,610 images successfully uploaded and accessible
+**And** Script logs upload progress ("1000/4610 uploaded")
+**And** Mapping file saved: `product-importer/image-url-mapping.json`
+
+### Story 2.3: Product Import Script - Core Engine
+
+**As a platform operator,**
+**I want to import 4,000 products with variants and metadata,**
+**So that the marketplace is populated with the complete catalog.**
+
+**Acceptance Criteria:**
+
+**Given** category mapping and image mapping files exist
+**When** I run the product import script
+**Then** Script reads all 8 product JSON files
+**And** Script loads category UUID mapping from Story 2.1
+**And** Script loads image URL mapping from Story 2.2
+
+**Given** product creation process
+**When** Script creates each product
+**Then** Products are created via Fleetbase Storefront API
+**And** Products include variants (SKU, price, inventory)
+**And** Products are linked to correct categories via UUID
+**And** Product images referenced by Fleetbase URLs
+
+**Given** product metadata
+**When** Products are imported
+**Then** Metadata is preserved (ingredients, nutrition, allergens, origin)
+**And** Tags are created from brand names
+**And** Product status is set to 'published'
+
+**Given** import processing
+**When** Script processes products
+**Then** Script processes in batches of 100 products
+**And** Script implements 1-2 second delay between batches
+**And** Script saves progress state for resume capability
+**And** Script handles API errors with retry logic (3 attempts)
+
+**Given** import completes
+**When** Script finishes execution
+**Then** All 4,000 products successfully imported
+**And** Script generates import report (success/failure counts)
+**And** State file saved: `product-importer/import-state.json`
+**And** Error log saved: `product-importer/import-errors.log`
+
+### Story 2.4: Import Validation & Reporting
+
+**As a platform operator,**
+**I want to validate the product import and generate reports,**
+**So that I can verify data integrity and identify any issues.**
+
+**Acceptance Criteria:**
+
+**Given** product import has completed
+**When** I run the validation script
+**Then** Script queries Fleetbase API for total product count
+**And** Script verifies all 4,000 products imported
+
+**Given** validation checks
+**When** Script validates imported data
+**Then** Script checks category assignments (all products have categories)
+**And** Script validates image URLs (all images accessible)
+**And** Script verifies variant data (SKU, price, inventory present)
+
+**Given** validation completes
+**When** Script generates report
+**Then** Script generates import summary report (Markdown)
+**And** Report includes: total products, categories, images, errors
+**And** Script identifies missing/failed products
+**And** Script generates retry list for failed products
+
+**Given** report is generated
+**When** I view the report
+**Then** Report saved: `product-importer/import-report.md`
+**And** Report shows ≥99% product import success rate
+**And** Report shows 100% category and image migration success
+
+### Story 2.5: Import Documentation & Runbook
+
+**As a platform operator,**
+**I want comprehensive documentation for the import process,**
+**So that I can re-run imports and troubleshoot issues.**
+
+**Acceptance Criteria:**
+
+**Given** import scripts are complete
+**When** Documentation is created
+**Then** README created: `product-importer/README.md`
+**And** Documentation includes prerequisites (Node.js, API keys)
+
+**Given** documentation content
+**When** I read the documentation
+**Then** Documentation includes step-by-step import instructions
+**And** Documentation includes script usage examples
+**And** Documentation includes troubleshooting guide
+**And** Documentation includes re-run/resume instructions
+
+**Given** operational needs
+**When** I need to perform import operations
+**Then** Documentation includes rollback procedures
+**And** Documentation includes expected timings (~30 min for full import)
+**And** Documentation includes environment variable setup
+**And** Documentation includes rate limiting and batch size tuning
+
+---
+
+## Epic 3: Seller Network Participation
 
 Verified members can join the Stalabard Network as independent sellers with their own stores.
 
-### Story 2.1: Store Creation Service & Network Invitation
+### Story 3.1: Store Creation Service & Network Invitation
 
 As a developer,
 I want to implement store creation within the Network for verified members,
@@ -496,7 +654,7 @@ So that members can join as independent sellers.
 **And** Idempotent behavior prevents duplicate stores
 **And** No error is thrown
 
-### Story 2.2: Seller Store Creation API
+### Story 3.2: Seller Store Creation API
 
 As a verified member,
 I want to request seller status and get my own store,
@@ -528,7 +686,7 @@ So that I can list products in the marketplace.
 **Then** Response returns 503 Service Unavailable
 **And** Error message explains Network capacity limitation
 
-### Story 2.3: Store-Scoped Authorization Guard
+### Story 3.3: Store-Scoped Authorization Guard
 
 As a platform operator,
 I want to enforce store-scoped access control,
@@ -564,7 +722,7 @@ So that sellers can only access their own store's resources.
 **And** Response returns 403 Forbidden
 **And** Audit log records unauthorized access attempt
 
-### Story 2.4: Seller Store Dashboard Access
+### Story 3.4: Seller Store Dashboard Access
 
 As a seller,
 I want to access Fleetbase Console to manage my store,
@@ -602,11 +760,11 @@ So that I can create and manage products using the native interface.
 **And** Owner can view Network-wide order statistics
 **And** Owner CANNOT access individual Store's private data (products/orders in detail)
 
-## Epic 3: Product Catalog Management
+## Epic 4: Product Catalog Management
 
 Sellers can create, publish, and manage products with DAO governance metadata.
 
-### Story 3.1: DAO Governance Extension Scaffold & Models
+### Story 4.1: DAO Governance Extension Scaffold & Models
 
 As a developer,
 I want to create the DAO Governance Extension with product governance models,
@@ -633,7 +791,7 @@ So that products can be tracked with DAO-specific metadata.
 **And** Foreign key to member_profiles table is defined
 **And** Index on governance_status for efficient filtering
 
-### Story 3.2: Product Creation with Governance Metadata
+### Story 4.2: Product Creation with Governance Metadata
 
 As a seller,
 I want to create products using Fleetbase Storefront with governance tracking,
@@ -666,7 +824,7 @@ So that my products are linked to my seller profile.
 **Then** Response returns 403 Forbidden
 **And** Error message states "Must be a seller with active Store"
 
-### Story 3.3: Product Publishing & Lifecycle Events
+### Story 4.3: Product Publishing & Lifecycle Events
 
 As a seller,
 I want to publish products directly without pre-approval,
@@ -698,7 +856,7 @@ So that my products are immediately available to buyers.
 **And** Product fields are updated
 **And** ProductUpdated event is fired
 
-### Story 3.4: Store-Scoped Product List API
+### Story 4.4: Store-Scoped Product List API
 
 As a seller,
 I want to view only my own products,
@@ -729,7 +887,7 @@ So that I can manage my store's inventory.
 **Then** Response returns 403 Forbidden
 **And** Error message states "Seller status required"
 
-### Story 3.5: Network-Wide Product Browse with Governance Filtering
+### Story 4.5: Network-Wide Product Browse with Governance Filtering
 
 As a buyer,
 I want to browse all published products across the Network,
@@ -760,7 +918,7 @@ So that I can discover items from all sellers.
 **Then** Governance filters are still applied
 **And** Only approved, published products match query
 
-### Story 3.6: Product Lifecycle Logging & Audit Trail
+### Story 4.6: Product Lifecycle Logging & Audit Trail
 
 As a platform operator,
 I want all product lifecycle transitions logged,
@@ -789,11 +947,11 @@ So that governance actions are auditable.
 **And** Response returns chronological event history
 **And** Each event includes actor, action, timestamp, state changes
 
-## Epic 4: Delivery Point Infrastructure
+## Epic 5: Delivery Point Infrastructure
 
 Platform operators can configure grocery stores as delivery hubs, and buyers can view available pickup locations.
 
-### Story 4.1: FleetOps Places Configuration for Delivery Hubs
+### Story 5.1: FleetOps Places Configuration for Delivery Hubs
 
 As a platform operator,
 I want to configure grocery stores as FleetOps Places,
@@ -826,7 +984,7 @@ So that they can serve as delivery points for customer order pickup.
 **And** Service area radius can be specified as alternative
 **And** Multiple Places can have overlapping service areas
 
-### Story 4.2: Delivery Point Capacity & Metadata Configuration
+### Story 5.2: Delivery Point Capacity & Metadata Configuration
 
 As a platform operator,
 I want to configure capacity limits and metadata for delivery hubs,
@@ -852,7 +1010,7 @@ So that order routing respects hub constraints.
 **And** Each Place includes status, operating hours, capacity settings
 **And** Results show current order count vs capacity
 
-### Story 4.3: Buyer-Facing Delivery Point Browse API
+### Story 5.3: Buyer-Facing Delivery Point Browse API
 
 As a buyer,
 I want to see available grocery store pickup locations,
@@ -884,7 +1042,7 @@ So that I can choose a convenient delivery point during checkout.
 **Then** Place is still shown but marked as "Limited availability"
 **And** Estimated next available time is displayed
 
-### Story 4.4: Delivery Point Performance Metrics Tracking
+### Story 5.4: Delivery Point Performance Metrics Tracking
 
 As a platform operator,
 I want to track delivery point performance metrics,
@@ -909,11 +1067,11 @@ So that I can optimize hub operations and identify issues.
 **And** Underperforming hubs are flagged
 **And** Capacity bottlenecks are highlighted
 
-## Epic 5: Marketplace Shopping & Checkout
+## Epic 6: Marketplace Shopping & Checkout
 
 Buyers can browse published products across all Network stores and select delivery points during checkout.
 
-### Story 5.1: Shopping Cart Management
+### Story 6.1: Shopping Cart Management
 
 As a buyer,
 I want to add products to my cart and manage quantities,
@@ -952,7 +1110,7 @@ So that I can purchase multiple items in a single order.
 **And** Product availability is re-checked
 **And** Unavailable items are flagged
 
-### Story 5.2: Checkout Flow with Delivery Point Selection
+### Story 6.2: Checkout Flow with Delivery Point Selection
 
 As a buyer,
 I want to initiate checkout and select my delivery point,
@@ -989,7 +1147,7 @@ So that I can specify where to pick up my order.
 **And** Alternative nearby Places are suggested
 **And** Buyer can override and proceed or select different Place
 
-### Story 5.3: Order Attribution & Multi-Store Order Handling
+### Story 6.3: Order Attribution & Multi-Store Order Handling
 
 As a platform,
 I want to properly attribute orders to buyers and sellers,
@@ -1022,11 +1180,11 @@ So that multi-vendor orders are handled correctly.
   - Order status
   - Timestamps
 
-## Epic 6: ELURC Non-Custodial Payments
+## Epic 7: ELURC Non-Custodial Payments
 
 Buyers can complete purchases using ELURC tokens via Phantom wallet with non-custodial payment verification.
 
-### Story 6.1: ELURC Payment Provider Extension Setup
+### Story 7.1: ELURC Payment Provider Extension Setup
 
 As a developer,
 I want to create the ELURC Payment Provider Extension,
@@ -1059,7 +1217,7 @@ So that blockchain payments can be integrated with Fleetbase.
 **And** Provider is registered in Fleetbase payment system
 **And** Provider identifier is 'elurc'
 
-### Story 6.2: ELURC Payment Intent Creation
+### Story 7.2: ELURC Payment Intent Creation
 
 As a buyer,
 I want to create an ELURC payment intent during checkout,
@@ -1090,7 +1248,7 @@ So that I know the exact payment details for my Phantom wallet.
 **And** Error message states "ELURC-only payment required for MVP"
 **And** Alternative payment methods are rejected
 
-### Story 6.3: Phantom Wallet Integration & Transaction Signing
+### Story 7.3: Phantom Wallet Integration & Transaction Signing
 
 As a buyer,
 I want to sign ELURC payment transaction with Phantom wallet,
@@ -1125,7 +1283,7 @@ So that I can complete payment without custodial key management.
 **And** Payment intent remains 'pending'
 **And** Buyer can retry payment
 
-### Story 6.4: Server-Side Transaction Verification
+### Story 7.4: Server-Side Transaction Verification
 
 As a platform,
 I want to verify ELURC transactions on-chain before completing orders,
@@ -1168,7 +1326,7 @@ So that payment authenticity is guaranteed.
 **And** Response returns 202 Accepted
 **And** Client polls /payments/v1/status/{order_uuid} for updates
 
-### Story 6.5: Payment Verification Job & Order Completion
+### Story 7.5: Payment Verification Job & Order Completion
 
 As a platform,
 I want to complete orders after payment verification,
@@ -1202,7 +1360,7 @@ So that the fulfillment process can begin.
 **And** Same result is returned without re-verification
 **And** No duplicate order completion is triggered
 
-### Story 6.6: Payment Status Polling API
+### Story 7.6: Payment Status Polling API
 
 As a buyer,
 I want to poll payment status during transaction confirmation,
@@ -1234,11 +1392,11 @@ So that I know when my order is ready.
 **And** Estimated confirmation time is provided
 **And** Polling is rate-limited to prevent abuse
 
-## Epic 7: 3-Leg Order Fulfillment & Routing
+## Epic 8: 3-Leg Order Fulfillment & Routing
 
 Orders route through a 3-leg delivery workflow (seller → grocery store → customer pickup) with status tracking and notifications.
 
-### Story 7.1: FleetOps Order Routing Integration Service
+### Story 8.1: FleetOps Order Routing Integration Service
 
 As a developer,
 I want to integrate FleetOps order routing with Storefront orders,
@@ -1263,7 +1421,7 @@ So that orders can be tracked through the 3-leg delivery workflow.
 **And** Custom fields are set: grocery_store_place_uuid, pickup_code, seller_store_uuid
 **And** Initial status is 'created'
 
-### Story 7.2: FleetOps Order Creation on Payment Completion
+### Story 8.2: FleetOps Order Creation on Payment Completion
 
 As a platform,
 I want to automatically create FleetOps routing orders after payment confirmation,
@@ -1293,7 +1451,7 @@ So that fulfillment workflow begins immediately.
 **And** Seller is notified with order details and delivery hub info
 **And** Grocery store is notified of incoming order (optional for MVP)
 
-### Story 7.3: Seller Order Dispatch & Hub Notification
+### Story 8.3: Seller Order Dispatch & Hub Notification
 
 As a seller,
 I want to mark orders as dispatched to the delivery hub,
@@ -1328,7 +1486,7 @@ So that the grocery store knows my order is on the way.
 **Then** estimated_arrival_at is stored
 **And** Grocery store sees expected delivery window
 
-### Story 7.4: Grocery Store Order Receipt & Confirmation
+### Story 8.4: Grocery Store Order Receipt & Confirmation
 
 As a grocery store operator,
 I want to confirm order receipt when seller delivers,
@@ -1360,7 +1518,7 @@ So that the order status reflects it's at my location.
 **And** ready_at timestamp is recorded
 **And** OrderReadyForPickup event is fired
 
-### Story 7.5: Customer Pickup Notification & Code Verification
+### Story 8.5: Customer Pickup Notification & Code Verification
 
 As a buyer,
 I want to receive a pickup code and notification when my order is ready,
@@ -1402,7 +1560,7 @@ So that I can collect my order from the grocery store.
 **And** Error message states "Invalid pickup code"
 **And** Order remains in 'ready_for_pickup' status
 
-### Story 7.6: Order Status Tracking for All Parties
+### Story 8.6: Order Status Tracking for All Parties
 
 As a buyer, seller, or platform operator,
 I want to view current order routing status,
@@ -1440,7 +1598,7 @@ So that I can track delivery progress.
   - completed_at
 **And** Time spent at each leg is calculated
 
-### Story 7.7: Order Routing Event Logging & Audit Trail
+### Story 8.7: Order Routing Event Logging & Audit Trail
 
 As a platform operator,
 I want all order routing transitions logged,
@@ -1475,7 +1633,7 @@ So that fulfillment workflow is auditable.
 **And** Response returns chronological routing history
 **And** Each transition includes actor (seller/hub/customer), timestamp, status change
 
-### Story 7.8: Order Routing Metrics Dashboard
+### Story 8.8: Order Routing Metrics Dashboard
 
 As a platform operator,
 I want to view order routing performance metrics,
@@ -1511,11 +1669,11 @@ So that I can identify bottlenecks and optimize delivery workflow.
 **And** Sellers with delayed dispatches are identified
 **And** Recommendations are provided (add capacity, adjust hours)
 
-## Epic 8: DAO Moderation & Platform Oversight
+## Epic 9: DAO Moderation & Platform Oversight
 
 DAO moderators can reactively intervene on flagged products, and platform operators can monitor network health and performance.
 
-### Story 8.1: Product Issue Reporting Models & API
+### Story 9.1: Product Issue Reporting Models & API
 
 As a developer,
 I want to create ProductIssue and ModerationAction models,
@@ -1544,7 +1702,7 @@ So that product flagging and moderation actions can be tracked.
 **And** Foreign keys are properly defined
 **And** Indexes on status, product_uuid, created_at for efficient queries
 
-### Story 8.2: Product Issue Reporting by Members
+### Story 9.2: Product Issue Reporting by Members
 
 As a verified member,
 I want to report problematic products,
@@ -1585,7 +1743,7 @@ So that DAO moderators can review and take action.
 **Then** System allows multiple issues per product
 **And** Each issue is tracked separately
 
-### Story 8.3: DAO Moderation Queue & Issue Review
+### Story 9.3: DAO Moderation Queue & Issue Review
 
 As a DAO moderator,
 I want to view flagged product issues in a moderation queue,
@@ -1624,7 +1782,7 @@ So that I can review and prioritize interventions.
 **And** Issue is assigned to me (moderator_uuid)
 **And** reviewed_at timestamp is set
 
-### Story 8.4: Moderation Action Application
+### Story 9.4: Moderation Action Application
 
 As a DAO moderator,
 I want to apply moderation actions on flagged products,
@@ -1670,7 +1828,7 @@ So that policy violations are addressed with clear rationale.
 **And** Response includes action details and updated product status
 **And** ModerationActionApplied event is fired
 
-### Story 8.5: Seller Notification of Moderation Actions
+### Story 9.5: Seller Notification of Moderation Actions
 
 As a seller,
 I want to be notified when my products are moderated,
@@ -1705,7 +1863,7 @@ So that I understand what happened and why.
 **Then** Notification states no violation found
 **And** Product remains unaffected
 
-### Story 8.6: Moderation Action Audit Trail
+### Story 9.6: Moderation Action Audit Trail
 
 As a platform operator,
 I want all moderation actions logged,
@@ -1734,7 +1892,7 @@ So that DAO governance is transparent and auditable.
   - Moderation actions taken
 **And** Complete timeline is visible
 
-### Story 8.7: Network Health Dashboard
+### Story 9.7: Network Health Dashboard
 
 As a platform operator,
 I want to view Network-wide health metrics,
@@ -1773,7 +1931,7 @@ So that I can monitor marketplace performance and identify issues.
   - Low order completion rate
   - Payment verification failures
 
-### Story 8.8: Moderation & Performance Operational Dashboard
+### Story 9.8: Moderation & Performance Operational Dashboard
 
 As a platform operator,
 I want comprehensive operational dashboards,
