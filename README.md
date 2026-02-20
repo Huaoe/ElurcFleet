@@ -38,6 +38,9 @@ Expected response: `{"status": "ok", "timestamp": "..."}`
 
 ### 3. Access Fleetbase Console
 
+Email: admin@stalabard.com
+Password: Xk9#mP2$vL7nQ4
+
 Open your browser and navigate to:
 - **Console URL**: http://localhost:8000/console
 - **API URL**: http://localhost:8000/api/v1
